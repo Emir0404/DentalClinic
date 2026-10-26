@@ -469,3 +469,39 @@ public class MigrationUpgradeTests : IDisposable
         Assert.False(db.Database.HasPendingModelChanges());
     }
 }
+
+/// <summary>The site must never show a person again: only photos that are known to contain nobody may be fetched.</summary>
+public class PhotoPolicyTests
+{
+    private static readonly string[] ApprovedPhotosWithoutPeople =
+        ["clinic-bright", "clinic-chair", "waiting-room", "implant", "braces-model", "toothbrush-bamboo", "toothbrush-red"];
+
+    [Fact]
+    public void Only_photos_of_empty_rooms_and_objects_are_downloaded_by_the_image_script()
+    {
+        var tsv = Path.Combine(FindRoot(), "tools", "images.tsv");
+
+        var names = File.ReadAllLines(tsv).Where(l => !string.IsNullOrWhiteSpace(l)).Select(l => l.Split('\t')[0]).ToList();
+
+        Assert.Equal(ApprovedPhotosWithoutPeople.Order(), names.Order());
+    }
+
+    [Fact]
+    public void Every_picture_the_pages_use_exists()
+    {
+        var img = Path.Combine(FindRoot(), "src", "DentalClinic", "wwwroot", "img");
+        var generated = new[] { "hero", "kids", "kids-2", "team-work", "consult", "smile-1", "smile-2", "smile-3", "smile-4", "braces-girl", "aligner",
+                                "aligner-case", "veneers", "xray", "exam", "tools", "cleaning", "extraction", "brushing",
+                                "doctor-lejla", "doctor-tarik", "doctor-mia", "doctor-adnan" };
+
+        Assert.All(generated.Concat(ApprovedPhotosWithoutPeople), n => Assert.True(File.Exists(Path.Combine(img, n + ".jpg")), $"{n}.jpg missing"));
+    }
+
+    private static string FindRoot()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !File.Exists(Path.Combine(dir.FullName, "tools", "images.tsv"))) dir = dir.Parent;
+        Assert.NotNull(dir);
+        return dir!.FullName;
+    }
+}

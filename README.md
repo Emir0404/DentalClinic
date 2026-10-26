@@ -53,8 +53,9 @@ All names, prices and the address are made up; the footer says so.
 - **Real migrations** with an upgrade path for old databases (one made by an earlier `EnsureCreated` version is adopted
   and upgraded without losing data), covered by tests.
 - **Time is injected** (`TimeProvider`), so rules like "cancel until 24 hours before" are tested with a fixed clock.
-- **No photos of real people.** The four doctors, the home page and the children's pictures are original illustrations
-  (`tools/generate-illustrations.py`), see [IMAGE-CREDITS.md](IMAGE-CREDITS.md).
+- **No pictures of people at all.** The doctors, the patients, the smiles, the braces, the x-ray and every other picture of a person
+  or a body part are original illustrations (`tools/generate-illustrations.py`); only 7 photos of empty rooms and objects remain, and a
+  test guards that list. No model releases, no look-alike problems. See [IMAGE-CREDITS.md](IMAGE-CREDITS.md).
 
 ## Run it
 
@@ -109,7 +110,7 @@ guessing**, **rate limits**, the per-contact cap, CSP and "no inline script" che
 
 - E-mails and text messages are not sent (there is no mail server in the demo).
 - Patient data is personal data: a real deployment needs a retention rule, backups and a data-processing agreement.
-- 23 of the Unsplash photos remain; see [IMAGE-CREDITS.md](IMAGE-CREDITS.md) (photographers are still to be looked up).
+- The 7 remaining Unsplash photos (empty rooms and objects) are credited by ID only, not by photographer; see [IMAGE-CREDITS.md](IMAGE-CREDITS.md).
 - One server: the booking lock is in-process.
 
 ## Tech
