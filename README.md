@@ -6,7 +6,17 @@ A complete website for a (fictional) dental clinic with **online appointment boo
 ASP.NET Core 10 MVC, EF Core and SQLite. The site is in Bosnian, the code and this documentation are in English.
 All names, prices and the address are made up; the footer says so.
 
-![Home](docs/home.png)
+## Screenshots
+
+The site is in Bosnian (demo content). Public pages, online booking, the admin area, and the site on a phone.
+
+<img src="docs/screenshots/01-home.png" alt="Home page" width="49%"> <img src="docs/screenshots/02-services.png" alt="Services" width="49%">
+
+<img src="docs/screenshots/03-team.png" alt="The team" width="49%"> <img src="docs/screenshots/04-booking.png" alt="Online booking" width="49%">
+
+<img src="docs/screenshots/06-admin-schedule.png" alt="Admin: daily schedule" width="49%"> <img src="docs/screenshots/05-admin-dashboard.png" alt="Admin: dashboard" width="49%">
+
+<img src="docs/screenshots/mobile-01-home.png" alt="Home page on a phone" width="24%"> <img src="docs/screenshots/mobile-04-booking.png" alt="Booking on a phone" width="24%">
 
 ## Features
 
@@ -22,14 +32,6 @@ All names, prices and the address are made up; the footer says so.
 - Appointments: search and filters, status (confirmed, completed, no-show, cancelled), internal notes, CSV export
 - Services: add, edit, hide, delete only when never booked. Doctors: add with photo, working shifts, deactivate with a warning
   about future appointments. Days off for the clinic or one doctor. Messages from the contact form.
-
-| Booking | Confirmation |
-|---|---|
-| ![Booking](docs/booking.png) | ![Confirmation](docs/confirmation.png) |
-
-| Team | Admin |
-|---|---|
-| ![Team](docs/team.png) | ![Admin](docs/admin-dashboard.png) |
 
 ## The interesting engineering
 
@@ -75,7 +77,7 @@ dotnet user-secrets set "Admin:Password" "a long secret" --project src/DentalCli
 ```
 
 ```bash
-dotnet test        # 216 tests
+dotnet test        # 221 tests
 ```
 
 ### Docker
@@ -100,7 +102,7 @@ docker run -p 8080:8080 -v clinic-data:/data -v clinic-photos:/app/wwwroot/img/u
 | `DataProtection:KeysPath` | none | Where login cookie keys are kept (set it in containers) |
 | `HttpsRedirection` | true outside Development | `false` behind a proxy that handles https |
 
-## Tests (216)
+## Tests (221)
 
 Free-time calculation, booking rules and simultaneous requests, cancelling and statuses, the whole booking journey over HTTP,
 the admin panel (services, doctors, shifts, days off, photo upload validation), CSV and calendar files, **access tokens and
