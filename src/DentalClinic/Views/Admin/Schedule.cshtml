@@ -16,7 +16,7 @@
     <a class="btn sm" asp-action="Schedule" asp-route-date="@Model.Date.AddDays(-1).ToString("yyyy-MM-dd")">← Prethodni</a>
     <a class="btn sm" asp-action="Schedule">Danas</a>
     <a class="btn sm" asp-action="Schedule" asp-route-date="@Model.Date.AddDays(1).ToString("yyyy-MM-dd")">Sljedeći →</a>
-    <form method="get" style="display:flex;gap:.4rem;margin:0"><input type="date" name="date" value="@Model.Date.ToString("yyyy-MM-dd")" /><button class="btn sm primary" type="submit">Idi</button></form>
+    <form method="get" class="inline-form"><input type="date" name="date" aria-label="Datum rasporeda" value="@Model.Date.ToString("yyyy-MM-dd")" /><button class="btn sm primary" type="submit">Idi</button></form>
 </div>
 
 <div class="sched-scroll">

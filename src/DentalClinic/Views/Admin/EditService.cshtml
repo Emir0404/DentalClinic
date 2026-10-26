@@ -8,7 +8,7 @@
     int total = isNew ? 0 : ViewBag.AppointmentCount;
 }
 <header class="page-title">
-    <div><a class="back" asp-action="Services">← Sve usluge</a><h1>@(isNew ? "Nova usluga" : Model.Name)</h1></div>
+    <div><a class="btn ghost sm back" asp-action="Services">← Sve usluge</a><h1>@(isNew ? "Nova usluga" : Model.Name)</h1></div>
     @if (!isNew) { <a class="btn ghost" href="/usluge/@ViewBag.Slug" target="_blank" rel="noopener">Pogledaj na sajtu ↗</a> }
 </header>
 <section class="panel">

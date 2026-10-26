@@ -25,7 +25,8 @@ h2{font-size:1.25rem;margin-bottom:1rem}
 .side-foot button:hover{background:rgba(255,255,255,.12)}
 .content{padding:2rem clamp(1rem,3vw,2.6rem) 4rem;min-width:0;max-width:1280px;width:100%}
 .page-title{display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem}
-.back{font-size:.85rem;text-decoration:none;display:inline-block;margin-bottom:.4rem}
+.back{margin-bottom:.6rem}
+.inline-form{display:flex;gap:.4rem;margin:0}
 .actions{display:flex;gap:.6rem;flex-wrap:wrap}
 .actions form{margin:0}
 
@@ -124,7 +125,7 @@ textarea{width:100%;resize:vertical}
 .login-brand{font:400 1.9rem var(--serif);color:var(--ink);display:flex;flex-direction:column;line-height:1;margin-bottom:1rem}
 .login-brand small{color:var(--teal)}
 .login-card label{font-weight:700;font-size:.88rem;margin-top:.5rem}
-.login-card .btn{margin-top:1rem;padding:.8rem}
+.login-card .btn{display:block;width:100%;text-align:center;margin-top:.8rem;padding:.8rem}
 .login-card .back{text-align:center;margin:.8rem 0 0}
 
 @media (max-width:860px){

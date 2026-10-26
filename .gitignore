@@ -488,3 +488,8 @@ $RECYCLE.BIN/
 zoo.db*
 clinic.db*
 src/DentalClinic/wwwroot/img/uploads/
+
+# Local databases
+*.db
+*.db-shm
+*.db-wal

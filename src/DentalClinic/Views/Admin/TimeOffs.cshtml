@@ -10,12 +10,12 @@
     <h2>Dodaj neradni dan</h2>
     <p class="muted small">Cijela ordinacija (praznik, renovacija) ili samo jedan doktor (godišnji odmor, kongres). Na te dane niko ne može zakazati. Već zakazani termini se ne brišu sami: sistem vas upozori koliko ih je.</p>
     <form method="post" asp-action="AddTimeOff" class="filters">
-        <input type="date" name="date" required min="@DateTime.Today.ToString("yyyy-MM-dd")" />
-        <select name="doctorId">
+        <input type="date" name="date" aria-label="Datum" required min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+        <select name="doctorId" aria-label="Doktor">
             <option value="">Cijela ordinacija</option>
             @foreach (var d in doctors) { <option value="@d.Id">@d.Name</option> }
         </select>
-        <input name="reason" maxlength="120" placeholder="Razlog (npr. Državni praznik)" required />
+        <input name="reason" aria-label="Razlog odsustva" maxlength="120" placeholder="Razlog (npr. Državni praznik)" required />
         <button class="btn primary" type="submit">Dodaj</button>
     </form>
 </section>

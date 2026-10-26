@@ -6,7 +6,7 @@
 }
 <header class="page-title">
     <div>
-        <a class="back" asp-action="Appointments">← Svi termini</a>
+        <a class="btn ghost sm back" asp-action="Appointments">← Svi termini</a>
         <h1>@Model.Reference <partial name="_Status" model="Model.Status" /></h1>
     </div>
     <div class="actions">
@@ -52,7 +52,7 @@
 
         <h2 style="margin-top:1.6rem">Interna bilješka</h2>
         <form method="post" asp-action="Note" asp-route-id="@Model.Id">
-            <textarea name="note" rows="4" maxlength="500" placeholder="Vidi samo osoblje (npr. 'alergija na penicilin', 'plaća fakturom')">@Model.StaffNote</textarea>
+            <textarea name="note" aria-label="Interna napomena" rows="4" maxlength="500" placeholder="Vidi samo osoblje (npr. 'alergija na penicilin', 'plaća fakturom')">@Model.StaffNote</textarea>
             <button class="btn" type="submit" style="margin-top:.6rem">Sačuvaj bilješku</button>
         </form>
     </section>

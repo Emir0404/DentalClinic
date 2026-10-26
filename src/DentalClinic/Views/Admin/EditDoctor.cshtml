@@ -12,7 +12,7 @@
     };
 }
 <header class="page-title">
-    <div><a class="back" asp-action="Doctors">← Svi doktori</a><h1>@(isNew ? "Novi doktor" : doctor.Name)</h1></div>
+    <div><a class="btn ghost sm back" asp-action="Doctors">← Svi doktori</a><h1>@(isNew ? "Novi doktor" : doctor.Name)</h1></div>
 </header>
 
 @if (!isNew && !doctor.IsActive)
@@ -57,7 +57,7 @@
             </div>
             <label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox" name="IsActive" value="true" checked="@(isNew || Model.IsActive)" /> Aktivan (vidi se na sajtu i prima termine)</label>
             <input type="hidden" name="IsActive" value="false" />
-            <div class="actions"><button class="btn primary" type="submit">@(isNew ? "Dodaj doktora" : "Sačuvaj")</button>@if (isNew) { <a class="btn ghost" asp-action="Doctors">Odustani</a> }</div>
+            <div class="actions"><button class="btn primary" type="submit">@(isNew ? "Dodaj doktora" : "Sačuvaj")</button><a class="btn ghost" asp-action="Doctors">Odustani</a></div>
         </form>
     </section>
 

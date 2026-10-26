@@ -19,8 +19,8 @@
 </header>
 
 <form method="get" class="filters">
-    <input type="search" name="q" value="@f.Q" placeholder="Šifra, ime, email, telefon…" />
-    <select name="status">
+    <input type="search" name="q" aria-label="Pretraga termina" value="@f.Q" placeholder="Šifra, ime, email, telefon…" />
+    <select name="status" aria-label="Status termina">
         <option value="all" selected="@(f.Status == "all")">Svi statusi</option>
         <option value="active" selected="@(f.Status == "active")">Aktivni</option>
         <option value="scheduled" selected="@(f.Status == "scheduled")">Zakazano</option>
@@ -29,7 +29,7 @@
         <option value="noshow" selected="@(f.Status == "noshow")">Nije došao/la</option>
         <option value="cancelled" selected="@(f.Status == "cancelled")">Otkazano</option>
     </select>
-    <select name="doctorId">
+    <select name="doctorId" aria-label="Doktor">
         <option value="">Svi doktori</option>
         @foreach (var d in Model.Doctors) { <option value="@d.Id" selected="@(f.DoctorId == d.Id)">@d.Name</option> }
     </select>
@@ -64,9 +64,9 @@
     @if (Model.Pages > 1)
     {
         <nav class="pager" aria-label="Stranice">
-            @if (f.Page > 1) { <a asp-action="Appointments" asp-all-route-data="Query(f.Page - 1)">← Prethodna</a> } else { <span></span> }
+            @if (f.Page > 1) { <a class="btn ghost sm" asp-action="Appointments" asp-all-route-data="Query(f.Page - 1)">← Prethodna</a> } else { <span></span> }
             <span>Stranica @f.Page od @Model.Pages</span>
-            @if (f.Page < Model.Pages) { <a asp-action="Appointments" asp-all-route-data="Query(f.Page + 1)">Sljedeća →</a> } else { <span></span> }
+            @if (f.Page < Model.Pages) { <a class="btn ghost sm" asp-action="Appointments" asp-all-route-data="Query(f.Page + 1)">Sljedeća →</a> } else { <span></span> }
         </nav>
     }
 </section>
