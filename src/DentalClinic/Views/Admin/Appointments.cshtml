@@ -1,0 +1,72 @@
+@model AppointmentListViewModel
+@{
+    ViewData["Title"] = "Termini";
+    var f = Model.Filter;
+    Dictionary<string, string?> Query(int? page = null)
+    {
+        var d = new Dictionary<string, string?>
+        {
+            ["q"] = f.Q, ["status"] = f.Status, ["doctorId"] = f.DoctorId?.ToString(),
+            ["from"] = f.From?.ToString("yyyy-MM-dd"), ["to"] = f.To?.ToString("yyyy-MM-dd"),
+        };
+        if (page is not null) d["page"] = page.ToString();
+        return d;
+    }
+}
+<header class="page-title">
+    <h1>Termini</h1>
+    <a class="btn" asp-action="Export" asp-all-route-data="Query()">Izvoz u CSV (Excel)</a>
+</header>
+
+<form method="get" class="filters">
+    <input type="search" name="q" value="@f.Q" placeholder="Šifra, ime, email, telefon…" />
+    <select name="status">
+        <option value="all" selected="@(f.Status == "all")">Svi statusi</option>
+        <option value="active" selected="@(f.Status == "active")">Aktivni</option>
+        <option value="scheduled" selected="@(f.Status == "scheduled")">Zakazano</option>
+        <option value="confirmed" selected="@(f.Status == "confirmed")">Potvrđeno</option>
+        <option value="completed" selected="@(f.Status == "completed")">Završeno</option>
+        <option value="noshow" selected="@(f.Status == "noshow")">Nije došao/la</option>
+        <option value="cancelled" selected="@(f.Status == "cancelled")">Otkazano</option>
+    </select>
+    <select name="doctorId">
+        <option value="">Svi doktori</option>
+        @foreach (var d in Model.Doctors) { <option value="@d.Id" selected="@(f.DoctorId == d.Id)">@d.Name</option> }
+    </select>
+    <label>Od <input type="date" name="from" value="@f.From?.ToString("yyyy-MM-dd")" /></label>
+    <label>Do <input type="date" name="to" value="@f.To?.ToString("yyyy-MM-dd")" /></label>
+    <button class="btn primary" type="submit">Filtriraj</button>
+    <a class="btn ghost" asp-action="Appointments">Poništi</a>
+</form>
+
+<section class="panel">
+    <p class="muted small">Pronađeno: <b>@Model.Total</b></p>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Termin</th><th>Pacijent</th><th>Usluga</th><th>Doktor</th><th>Šifra</th><th>Status</th></tr></thead>
+            <tbody>
+            @foreach (var a in Model.Items)
+            {
+                <tr class="link" data-href="@Url.Action("Appointment", new { id = a.Id })">
+                    <td><b>@a.Start.ToString("dd.MM.yyyy.")</b><br /><span class="muted small">@a.Start.ToString("HH:mm") – @a.End.ToString("HH:mm")</span></td>
+                    <td>@a.PatientName<br /><span class="muted small">@a.Phone</span></td>
+                    <td>@a.Service.Name</td>
+                    <td>@a.Doctor.Name</td>
+                    <td><a asp-action="Appointment" asp-route-id="@a.Id">@a.Reference</a></td>
+                    <td><partial name="_Status" model="a.Status" /></td>
+                </tr>
+            }
+            @if (Model.Items.Count == 0) { <tr><td colspan="6" class="muted">Nema termina za zadane filtere.</td></tr> }
+            </tbody>
+        </table>
+    </div>
+
+    @if (Model.Pages > 1)
+    {
+        <nav class="pager" aria-label="Stranice">
+            @if (f.Page > 1) { <a asp-action="Appointments" asp-all-route-data="Query(f.Page - 1)">← Prethodna</a> } else { <span></span> }
+            <span>Stranica @f.Page od @Model.Pages</span>
+            @if (f.Page < Model.Pages) { <a asp-action="Appointments" asp-all-route-data="Query(f.Page + 1)">Sljedeća →</a> } else { <span></span> }
+        </nav>
+    }
+</section>

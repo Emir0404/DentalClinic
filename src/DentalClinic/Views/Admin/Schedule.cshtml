@@ -1,0 +1,57 @@
+@model ScheduleViewModel
+@{
+    ViewData["Title"] = "Raspored";
+    var culture = ClinicInfo.Culture;
+    const int startHour = 8, endHour = 20, rowPx = 30;
+    var rows = (endHour - startHour) * 2;
+    int Top(TimeSpan t) => (int)((t.TotalMinutes - startHour * 60) / 30 * rowPx);
+    var clinicOff = Model.TimeOffs.FirstOrDefault(t => t.DoctorId is null);
+}
+<header class="page-title">
+    <h1>Raspored</h1>
+    <span class="muted">@Model.Date.ToString("dddd, d. MMMM yyyy.", culture)</span>
+</header>
+
+<div class="sched-nav">
+    <a class="btn sm" asp-action="Schedule" asp-route-date="@Model.Date.AddDays(-1).ToString("yyyy-MM-dd")">← Prethodni</a>
+    <a class="btn sm" asp-action="Schedule">Danas</a>
+    <a class="btn sm" asp-action="Schedule" asp-route-date="@Model.Date.AddDays(1).ToString("yyyy-MM-dd")">Sljedeći →</a>
+    <form method="get" style="display:flex;gap:.4rem;margin:0"><input type="date" name="date" value="@Model.Date.ToString("yyyy-MM-dd")" /><button class="btn sm primary" type="submit">Idi</button></form>
+</div>
+
+<div class="sched-scroll">
+    <div class="sched" style="--cols:@Model.Doctors.Count;--rows:@rows">
+        <div class="sched-head"></div>
+        @foreach (var d in Model.Doctors) { <div class="sched-head">@d.Name<small>@d.Title.Split(',')[0]</small></div> }
+
+        <div class="axis">
+            @for (var h = startHour; h < endHour; h++) { <span style="top:@((h - startHour) * 2 * rowPx)px">@($"{h:00}:00")</span> }
+        </div>
+        @foreach (var d in Model.Doctors)
+        {
+            var off = clinicOff ?? Model.TimeOffs.FirstOrDefault(t => t.DoctorId == d.Id);
+            <div class="col">
+                @if (off is not null)
+                {
+                    <div class="off">Ne radi: @off.Reason</div>
+                }
+                else
+                {
+                    @foreach (var shift in d.Shifts.Where(s => s.Day == Model.Date.DayOfWeek))
+                    {
+                        <div class="work" style="top:@(Top(shift.Start))px;height:@(Top(shift.End) - Top(shift.Start))px"></div>
+                    }
+                    @foreach (var a in Model.Appointments.Where(a => a.DoctorId == d.Id))
+                    {
+                        <a class="appt @a.Status.ToString().ToLowerInvariant()" asp-action="Appointment" asp-route-id="@a.Id"
+                           style="top:@(Top(a.Start.TimeOfDay))px;height:@(a.DurationMinutes / 30 * rowPx - 2)px"
+                           title="@a.Service.Name">
+                            <b>@a.Start.ToString("HH:mm") @a.PatientName</b>@a.Service.Name
+                        </a>
+                    }
+                }
+            </div>
+        }
+    </div>
+</div>
+<p class="muted small" style="margin-top:1rem">Bijela površina je radno vrijeme doktora. Žuto: zakazano · zeleno-plavo: potvrđeno · zeleno: završeno · crveno: nije došao/la.</p>

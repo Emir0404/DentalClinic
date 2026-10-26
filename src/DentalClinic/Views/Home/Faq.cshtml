@@ -1,0 +1,52 @@
+@{
+    ViewData["Title"] = "Česta pitanja";
+    ViewData["Description"] = "Odgovori na najčešća pitanja pacijenata: bol, cijene, otkazivanje termina, sterilizacija, hitni slučajevi i djeca.";
+    var faq = new (string Q, string A)[]
+    {
+        ("Da li će me boljeti?", "Ne treba. Prije svake injekcije nanosimo anestetički gel, a zahvate radimo uz dobru lokalnu anesteziju. Dogovorimo i znak rukom: ako ga date, odmah stajemo."),
+        ("Imam veliki strah od zubara. Šta da radim?", "Recite nam to pri zakazivanju i na početku pregleda. Prvi termin može biti samo upoznavanje i razgovor, bez ikakvog zahvata. Mnogi pacijenti kažu da im je to najviše pomoglo."),
+        ("Mogu li saznati cijenu prije liječenja?", "Da, uvijek. Nakon pregleda dobijate pisani plan liječenja s cijenom za svaku stavku. Ništa se ne radi bez vašeg odobrenja."),
+        ("Kako mogu platiti?", "Gotovinom ili platnom karticom u ordinaciji. Za veće radove (implantati, ortodoncija) dogovaramo plaćanje na rate."),
+        ("Kako da otkažem ili promijenim termin?", "Preko sajta, na stranici „Moj termin“, uz šifru termina i email. Besplatno je do 24 sata prije dolaska. Poslije toga nas nazovite, pa ćemo se dogovoriti."),
+        ("Šta ako zakasnim?", "Javite nam se telefonom. Ako kasnite do 15 minuta, pokušat ćemo da završimo cijeli zahvat. Za duža kašnjenja moramo dogovoriti novi termin da ne kasnimo s drugim pacijentima."),
+        ("Kako je osigurana higijena?", "Svi instrumenti se peru, pakuju pojedinačno i sterilišu u autoklavu. Za svakog pacijenta otvaramo novi sterilni komplet, a rukavice, maske i zaštitne navlake su jednokratne."),
+        ("Šta ako imam jaku bol ili se povrijedim?", "Nazovite nas odmah na " + ClinicInfo.Phone + ". Hitne slučajeve primamo istog dana, čim je moguće. Ako je otekao obraz ili imate temperaturu, javite se odmah."),
+        ("Od koje godine djeca mogu doći?", "Kad izbiju prvi zubi, najkasnije oko prvog rođendana. Prvi pregled je upoznavanje i traje kratko. Naš doktor Adnan i doktorica Mia rade s djecom svaki dan."),
+        ("Koliko traje izbjeljivanje i koliko dugo se drži?", "Zahvat traje oko sat i po. Zubi postanu svjetliji za nekoliko tonova, a efekat traje 1 do 3 godine, zavisno od kafe, čaja, cigareta i njege."),
+        ("Da li dajete garanciju na radove?", "Da. Na plombe, krunice i implantate dajemo garanciju, a uslov je redovan pregled jednom godišnje. Konkretan rok vam doktor napiše u planu liječenja."),
+        ("Radite li s osiguranjem?", "Pitanje osiguranja rješavamo pojedinačno. Nazovite nas prije dolaska, pa ćemo vam reći šta je moguće pokriti."),
+    };
+}
+<section class="page-head">
+    <div class="container">
+        <div class="crumbs"><a href="/">Početna</a> / Česta pitanja</div>
+        <h1>Česta pitanja</h1>
+        <p>Ako ovdje ne nađete odgovor, slobodno nas pitajte.</p>
+    </div>
+</section>
+<section class="section tight">
+    <div class="container">
+        <div class="faq">
+            @foreach (var (q, a) in faq) { <details><summary>@q</summary><p>@a</p></details> }
+        </div>
+        <div class="cta" style="margin-top:3rem">
+            <div><h2>Imate još pitanja?</h2><p>Pozovite nas ili pošaljite poruku. Odgovaramo istog radnog dana.</p></div>
+            <a class="btn btn-light" href="/kontakt">Kontaktirajte nas</a>
+        </div>
+    </div>
+</section>
+@section Head {
+    <script type="application/ld+json">
+    {
+      "@@context": "https://schema.org",
+      "@@type": "FAQPage",
+      "mainEntity": [
+        @for (var i = 0; i < faq.Length; i++)
+        {
+            @Html.Raw("{\"@type\":\"Question\",\"name\":" + System.Text.Json.JsonSerializer.Serialize(faq[i].Q, new System.Text.Json.JsonSerializerOptions { Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping })
+                + ",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":" + System.Text.Json.JsonSerializer.Serialize(faq[i].A, new System.Text.Json.JsonSerializerOptions { Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }) + "}}" + (i < faq.Length - 1 ? "," : ""))
+        }
+      ]
+    }
+    </script>
+}

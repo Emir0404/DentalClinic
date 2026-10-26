@@ -1,0 +1,88 @@
+@model Service
+@{
+    ViewData["Title"] = Model.Name;
+    ViewData["Description"] = Model.Summary;
+    ViewData["Image"] = Model.ImageUrl;
+    var doctors = (List<Doctor>)ViewBag.Doctors;
+    var others = (List<Service>)ViewBag.Others;
+    var paragraphs = Model.Description.Replace("\r\n", "\n").Split("\n\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+}
+<section class="page-head">
+    <div class="container">
+        <div class="crumbs"><a href="/">Početna</a> / <a href="/usluge">Usluge</a> / @Model.Name</div>
+        <span class="eyebrow light">@Model.Category</span>
+        <h1>@Model.Name</h1>
+        <p>@Model.Summary</p>
+        <div class="facts">
+            <div class="fact"><small>Trajanje</small><b>@Model.DurationText</b></div>
+            <div class="fact"><small>Cijena</small><b>@Model.PriceText</b></div>
+            <div class="fact"><small>Ugodnost</small><b>@Model.Comfort</b></div>
+        </div>
+    </div>
+</section>
+
+<section class="section tight">
+    <div class="container detail">
+        <div class="detail-main">
+            <img src="@Model.ImageUrl" alt="@Model.Name" width="900" height="520" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:24px;margin-bottom:2rem;box-shadow:var(--shadow)" />
+
+            <h2>Šta je to?</h2>
+            @foreach (var p in paragraphs) { <p>@p</p> }
+
+            <h2>Kako izgleda zahvat</h2>
+            <ol class="numbered">
+                @foreach (var step in Model.StepList) { <li>@step</li> }
+            </ol>
+
+            <h2>Poslije zahvata</h2>
+            <ul class="checklist">
+                @foreach (var a in Model.AftercareList) { <li><svg class="ic"><use href="#i-check"/></svg><span>@a</span></li> }
+            </ul>
+
+            <h2>Za koga je</h2>
+            <p>@Model.SuitableFor</p>
+
+            <div class="note" style="margin-top:2rem">
+                <b>Važno:</b> navedena cijena je orijentaciona. Tačnu cijenu doktor određuje nakon pregleda i zajedno s vama, prije početka liječenja.
+            </div>
+
+            @if (doctors.Count > 0)
+            {
+                <h2>Ko ovo radi</h2>
+                <div class="chips" style="margin-top:0">
+                    @foreach (var d in doctors) { <a href="/tim#@d.Slug">@d.Name</a> }
+                </div>
+            }
+        </div>
+
+        <aside class="side-card">
+            <span class="eyebrow">Cijena</span>
+            <div class="price">@Model.PriceText</div>
+            <dl>
+                <div><dt>Trajanje</dt><dd>@Model.DurationText</dd></div>
+                <div><dt>Ugodnost</dt><dd>@Model.Comfort</dd></div>
+                <div><dt>Otkazivanje</dt><dd>besplatno do 24 h</dd></div>
+            </dl>
+            <a class="btn btn-primary btn-block" href="/zakazivanje?usluga=@Model.Slug"><svg class="ic"><use href="#i-calendar"/></svg> Zakaži ovu uslugu</a>
+            <p class="small muted" style="margin:1rem 0 0">Pitanja? Nazovite nas na <a href="tel:@ClinicInfo.PhoneLink">@ClinicInfo.Phone</a>.</p>
+        </aside>
+    </div>
+</section>
+
+@if (others.Count > 0)
+{
+    <section class="section tint">
+        <div class="container">
+            <h2 style="font-size:1.8rem">Možda vas zanima i</h2>
+            <div class="cards">
+                @foreach (var s in others)
+                {
+                    <a class="card" href="/usluge/@s.Slug">
+                        <div class="card-img"><img src="@s.ImageUrl" alt="@s.Name" loading="lazy" /></div>
+                        <div class="card-body"><h3>@s.Name</h3><p>@s.Summary</p><div class="card-meta"><span>@s.DurationText</span><span>@s.PriceText</span></div></div>
+                    </a>
+                }
+            </div>
+        </div>
+    </section>
+}

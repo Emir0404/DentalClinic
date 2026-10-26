@@ -1,0 +1,76 @@
+@model ServiceEditModel
+@{
+    var isNew = ViewBag.IsNew is true;
+    ViewData["Title"] = isNew ? "Nova usluga" : "Uredi uslugu";
+    var doctors = (List<Doctor>)ViewBag.AllDoctors;
+    var categories = (List<string>)ViewBag.Categories;
+    var images = (List<string>)ViewBag.Images;
+    int total = isNew ? 0 : ViewBag.AppointmentCount;
+}
+<header class="page-title">
+    <div><a class="back" asp-action="Services">← Sve usluge</a><h1>@(isNew ? "Nova usluga" : Model.Name)</h1></div>
+    @if (!isNew) { <a class="btn ghost" href="/usluge/@ViewBag.Slug" target="_blank" rel="noopener">Pogledaj na sajtu ↗</a> }
+</header>
+<section class="panel">
+    <form method="post" class="form">
+        <div class="row">
+            <div><label for="Name">Naziv</label><input id="Name" name="Name" value="@Model.Name" required maxlength="120" />@Html.ValidationMessage("Name", new { @class = "err" })</div>
+            <div><label for="Category">Kategorija</label><input id="Category" name="Category" value="@Model.Category" list="cats" required maxlength="60" />
+                <datalist id="cats">@foreach (var c in categories) { <option value="@c"></option> }</datalist>
+                @Html.ValidationMessage("Category", new { @class = "err" })<div class="hint">Odaberite postojeću ili upišite novu.</div></div>
+        </div>
+        <div><label for="Summary">Kratak opis (jedna rečenica)</label><input id="Summary" name="Summary" value="@Model.Summary" required maxlength="300" />@Html.ValidationMessage("Summary", new { @class = "err" })</div>
+        <div class="row">
+            <div><label for="DurationMinutes">Trajanje</label><select id="DurationMinutes" name="DurationMinutes">
+                @foreach (var m in new[] { 30, 60, 90, 120, 150, 180, 240 }) { <option value="@m" selected="@(Model.DurationMinutes == m)">@m min</option> }
+            </select>@Html.ValidationMessage("DurationMinutes", new { @class = "err" })</div>
+            <div><label for="PriceFrom">Cijena od (KM)</label><input id="PriceFrom" name="PriceFrom" type="number" step="1" min="0" value="@(Model.PriceFrom == 0 ? "" : Model.PriceFrom.ToString("0"))" />@Html.ValidationMessage("PriceFrom", new { @class = "err" })</div>
+            <div><label for="PriceTo">Cijena do (KM, nije obavezno)</label><input id="PriceTo" name="PriceTo" type="number" step="1" min="0" value="@Model.PriceTo?.ToString("0")" />@Html.ValidationMessage("PriceTo", new { @class = "err" })</div>
+        </div>
+        <div class="row">
+            <div><label for="Comfort">Ugodnost (npr. „Lokalna anestezija“)</label><input id="Comfort" name="Comfort" value="@Model.Comfort" maxlength="80" /></div>
+            <div><label for="ImageName">Slika na sajtu</label>
+                <select id="ImageName" name="ImageName" data-preview-target="imgPreview" data-preview-prefix="/img/" data-preview-suffix=".jpg">
+                    @foreach (var img in images) { <option value="@img" selected="@(Model.ImageName == img)">@img</option> }
+                </select>
+                @Html.ValidationMessage("ImageName", new { @class = "err" })
+                <img id="imgPreview" class="svc-preview" src="/img/@(Model.ImageName).jpg" alt="" width="160" height="100" />
+            </div>
+        </div>
+        <div><label for="Description">Šta je to (pasusi odvojeni praznim redom)</label><textarea id="Description" name="Description" rows="6">@Model.Description</textarea></div>
+        <div><label for="Steps">Kako izgleda zahvat (jedan korak po redu)</label><textarea id="Steps" name="Steps" rows="6">@Model.Steps</textarea></div>
+        <div><label for="Aftercare">Poslije zahvata (jedna stavka po redu)</label><textarea id="Aftercare" name="Aftercare" rows="5">@Model.Aftercare</textarea></div>
+        <div><label for="SuitableFor">Za koga je</label><textarea id="SuitableFor" name="SuitableFor" rows="3">@Model.SuitableFor</textarea></div>
+        <div>
+            <label>Ko radi ovu uslugu</label>
+            <div class="checks">
+                @foreach (var d in doctors)
+                {
+                    <label><input type="checkbox" name="DoctorIds" value="@d.Id" checked="@Model.DoctorIds.Contains(d.Id)" /> @d.Name</label>
+                }
+            </div>
+            <div class="hint">Usluga se može zakazati samo ako je radi barem jedan aktivan doktor s radnim vremenom.</div>
+        </div>
+        <label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox" name="IsActive" value="true" checked="@(isNew || Model.IsActive)" /> Aktivna (vidljiva na sajtu i u zakazivanju)</label>
+        <input type="hidden" name="IsActive" value="false" />
+        <div class="actions"><button class="btn primary" type="submit">@(isNew ? "Dodaj uslugu" : "Sačuvaj")</button><a class="btn ghost" asp-action="Services">Odustani</a></div>
+    </form>
+</section>
+
+@if (!isNew)
+{
+    <section class="panel danger-zone">
+        <h2>Brisanje usluge</h2>
+        @if (total > 0)
+        {
+            <p class="small">Ova usluga ima <b>@total</b> termina u evidenciji, pa se ne može obrisati (historija mora ostati sačuvana). Ako se više ne nudi, isključite kvačicu „Aktivna“ i sačuvajte.</p>
+        }
+        else
+        {
+            <p class="small">Usluga nema nijedan termin pa se može trajno obrisati.</p>
+            <form method="post" asp-action="DeleteService" asp-route-id="@Model.Id" data-confirm="Trajno obrisati uslugu @Model.Name?">
+                <button class="btn danger" type="submit">Obriši uslugu</button>
+            </form>
+        }
+    </section>
+}

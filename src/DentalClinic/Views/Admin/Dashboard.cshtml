@@ -1,0 +1,61 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Pregled";
+    var culture = ClinicInfo.Culture;
+    var max = Math.Max(1, Model.NextDays.Max(d => d.Count));
+}
+<header class="page-title">
+    <h1>Pregled</h1>
+    <span class="muted">@DateTime.Now.ToString("dddd, d. MMMM yyyy.", culture)</span>
+</header>
+
+<section class="stats">
+    <div class="stat"><span>Termina danas</span><b>@Model.Today.Count</b><small>aktivnih i završenih</small></div>
+    <div class="stat"><span>Sutra</span><b>@Model.TomorrowCount</b><small>zakazanih termina</small></div>
+    <div class="stat"><span>Narednih 7 dana</span><b>@Model.WeekCount</b><small>aktivnih termina</small></div>
+    <div class="stat"><span>Nisu došli (30 dana)</span><b>@Model.NoShowRate.ToString("P0", culture)</b><small>od @(Model.Completed30Days) završenih</small></div>
+    <div class="stat"><span>Nove poruke</span><b>@Model.UnhandledMessages</b><small>čeka odgovor</small></div>
+</section>
+
+<div class="two-col">
+    <section class="panel">
+        <div class="panel-head"><h2>Danas</h2><a asp-action="Schedule">Cijeli raspored →</a></div>
+        @if (Model.Today.Count == 0)
+        {
+            <p class="muted">Danas nema zakazanih termina.</p>
+        }
+        else
+        {
+            <ul class="today-list">
+                @foreach (var a in Model.Today)
+                {
+                    <li class="@(a.Status is AppointmentStatus.NoShow ? "dim" : "")">
+                        <time>@a.Start.ToString("HH:mm")</time>
+                        <div><a asp-action="Appointment" asp-route-id="@a.Id"><b>@a.PatientName</b></a><small>@a.Service.Name · @a.Doctor.Name</small></div>
+                        <partial name="_Status" model="a.Status" />
+                    </li>
+                }
+            </ul>
+        }
+    </section>
+
+    <div>
+        <section class="panel">
+            <h2>Zauzetost narednih 7 dana</h2>
+            <div class="bars">
+                @foreach (var (day, count) in Model.NextDays)
+                {
+                    <div class="bar" title="@count termina"><b>@count</b><i style="height:@(count * 100 / max)%"></i><span>@day.ToString("ddd d.", culture)</span></div>
+                }
+            </div>
+        </section>
+        <section class="panel">
+            <div class="panel-head"><h2>Nove poruke</h2><a asp-action="Messages">Sve poruke →</a></div>
+            @if (Model.RecentMessages.Count == 0) { <p class="muted">Nema novih poruka.</p> }
+            @foreach (var m in Model.RecentMessages)
+            {
+                <div style="padding:.6rem 0;border-bottom:1px solid var(--line)"><b>@m.Name</b> <span class="muted small">@m.CreatedAt.ToLocalTime().ToString("dd.MM. HH:mm")</span><br />@(m.Message.Length > 110 ? m.Message[..110] + "…" : m.Message)</div>
+            }
+        </section>
+    </div>
+</div>

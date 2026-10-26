@@ -1,0 +1,7 @@
+@model int
+@{ ViewData["Title"] = Model == 404 ? "Stranica nije pronađena" : "Greška"; }
+<section class="page-head"><div class="container">
+    <span class="eyebrow light">Greška @Model</span>
+    <h1>@(Model == 404 ? "Ovu stranicu ne možemo naći" : "Nešto nije u redu")</h1>
+    <p>@(Model == 404 ? "Možda je link pogrešan ili je stranica premještena." : "Zahtjev nije mogao biti obrađen.") Vratite se na <a href="/" style="color:#ffb199">početnu stranicu</a> ili <a href="/zakazivanje" style="color:#ffb199">zakažite termin</a>.</p>
+</div></section>

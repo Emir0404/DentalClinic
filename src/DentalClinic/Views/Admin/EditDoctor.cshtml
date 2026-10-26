@@ -1,0 +1,132 @@
+@model DoctorEditModel
+@{
+    var isNew = ViewBag.IsNew is true;
+    ViewData["Title"] = isNew ? "Novi doktor" : "Uredi doktora";
+    var doctor = (Doctor)ViewBag.Doctor;
+    var allServices = (List<Service>)ViewBag.AllServices;
+    int upcoming = ViewBag.Upcoming, total = ViewBag.AppointmentCount;
+    var dayNames = new Dictionary<DayOfWeek, string>
+    {
+        [DayOfWeek.Monday] = "Ponedjeljak", [DayOfWeek.Tuesday] = "Utorak", [DayOfWeek.Wednesday] = "Srijeda",
+        [DayOfWeek.Thursday] = "Četvrtak", [DayOfWeek.Friday] = "Petak", [DayOfWeek.Saturday] = "Subota", [DayOfWeek.Sunday] = "Nedjelja",
+    };
+}
+<header class="page-title">
+    <div><a class="back" asp-action="Doctors">← Svi doktori</a><h1>@(isNew ? "Novi doktor" : doctor.Name)</h1></div>
+</header>
+
+@if (!isNew && !doctor.IsActive)
+{
+    <div class="flash err" role="status">Ovaj doktor je <b>deaktiviran</b>: ne vidi se na sajtu i ne prima nove termine.</div>
+}
+@if (!isNew && upcoming > 0)
+{
+    <div class="flash ok" role="status">Doktor ima <b>@upcoming</b> budućih termina.
+        <a asp-action="Appointments" asp-route-doctorId="@doctor.Id" asp-route-status="active" asp-route-from="@DateTime.Today.ToString("yyyy-MM-dd")">Pogledaj ih →</a></div>
+}
+
+<div class="two-col">
+    <section class="panel">
+        <h2>@(isNew ? "Podaci o doktoru" : "Podaci i usluge")</h2>
+        <form method="post" enctype="multipart/form-data" class="form">
+            <div class="photo-row">
+                <img class="photo-preview" src="@doctor.PhotoUrl" alt="" width="84" height="105" />
+                <div>
+                    <label for="photo">Fotografija (JPG, PNG ili WEBP, do 4 MB)</label>
+                    <input id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" />
+                    @Html.ValidationMessage("photo", new { @class = "err" })
+                    @if (!isNew && !string.IsNullOrEmpty(doctor.PhotoName))
+                    {
+                        <label style="display:flex;gap:.5rem;align-items:center;font-weight:500;margin-top:.5rem"><input type="checkbox" name="removePhoto" value="true" /> Ukloni trenutnu fotografiju</label>
+                    }
+                    <p class="hint">Portret na svijetloj pozadini, lice u gornjoj polovini slike. Ako je ne dodate, prikazuje se silueta.</p>
+                </div>
+            </div>
+            <div><label for="Name">Ime i prezime (s titulom)</label><input id="Name" name="Name" value="@Model.Name" required maxlength="100" placeholder="Dr. Ime Prezime" />@Html.ValidationMessage("Name", new { @class = "err" })</div>
+            <div><label for="Title">Titula / specijalnost</label><input id="Title" name="Title" value="@Model.Title" required maxlength="120" placeholder="npr. Doktor stomatologije, specijalista parodontologije" />@Html.ValidationMessage("Title", new { @class = "err" })</div>
+            <div><label for="YearsExperience">Godina iskustva</label><input id="YearsExperience" name="YearsExperience" type="number" min="0" max="60" value="@Model.YearsExperience" /></div>
+            <div><label for="Bio">Kratka biografija</label><textarea id="Bio" name="Bio" rows="5">@Model.Bio</textarea></div>
+            <div>
+                <label>Usluge koje radi</label>
+                <div class="checks">
+                    @foreach (var s in allServices)
+                    {
+                        <label><input type="checkbox" name="ServiceIds" value="@s.Id" checked="@Model.ServiceIds.Contains(s.Id)" /> @s.Name</label>
+                    }
+                </div>
+            </div>
+            <label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox" name="IsActive" value="true" checked="@(isNew || Model.IsActive)" /> Aktivan (vidi se na sajtu i prima termine)</label>
+            <input type="hidden" name="IsActive" value="false" />
+            <div class="actions"><button class="btn primary" type="submit">@(isNew ? "Dodaj doktora" : "Sačuvaj")</button>@if (isNew) { <a class="btn ghost" asp-action="Doctors">Odustani</a> }</div>
+        </form>
+    </section>
+
+    @if (isNew)
+    {
+        <section class="panel">
+            <h2>Šta slijedi</h2>
+            <ol class="small" style="padding-left:1.2rem;line-height:1.8">
+                <li>Unesite podatke i odaberite usluge koje doktor radi.</li>
+                <li>Nakon čuvanja otvorit će se stranica doktora gdje <b>dodajete radno vrijeme</b> po danima.</li>
+                <li>Čim doktor ima smjenu i barem jednu uslugu, pacijenti ga mogu birati pri zakazivanju.</li>
+            </ol>
+        </section>
+    }
+    else
+    {
+        <div>
+            <section class="panel">
+                <h2>Radno vrijeme</h2>
+                <p class="muted small">Pauza između dva bloka u istom danu (npr. 09:00–12:00 i 13:00–17:00) znači da u tom razmaku niko ne može zakazati. Vrijeme mora biti na pun ili pola sata.</p>
+                <table>
+                    <tbody>
+                    @foreach (var shift in doctor.Shifts.OrderBy(s => ((int)s.Day + 6) % 7).ThenBy(s => s.Start))
+                    {
+                        <tr>
+                            <td><b>@dayNames[shift.Day]</b></td>
+                            <td>@shift.Start.ToString(@"hh\:mm") – @shift.End.ToString(@"hh\:mm")</td>
+                            <td class="r">
+                                <form method="post" asp-action="RemoveShift" asp-route-id="@doctor.Id" asp-route-shiftId="@shift.Id" style="margin:0">
+                                    <button class="btn sm danger" type="submit">Ukloni</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                    @if (doctor.Shifts.Count == 0) { <tr><td class="muted">Nema unesenih smjena: doktor ne prima termine.</td></tr> }
+                    </tbody>
+                </table>
+
+                <h2 style="margin-top:1.6rem">Dodaj smjenu</h2>
+                <form method="post" asp-action="AddShift" asp-route-id="@doctor.Id" class="filters">
+                    <select name="day">
+                        @foreach (var d in new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday })
+                        {
+                            <option value="@d">@dayNames[d]</option>
+                        }
+                    </select>
+                    <label>Od <input type="time" name="from" step="1800" value="09:00" required /></label>
+                    <label>Do <input type="time" name="to" step="1800" value="12:00" required /></label>
+                    <button class="btn primary" type="submit">Dodaj</button>
+                </form>
+            </section>
+
+            <section class="panel danger-zone">
+                <h2>Doktor više ne radi u ordinaciji?</h2>
+                <p class="small">Najsigurnije je <b>deaktivirati</b> doktora: nestaje sa sajta i ne prima nove termine, a historija termina ostaje sačuvana. Za to isključite kvačicu „Aktivan“ lijevo i sačuvajte.</p>
+                <p class="small">Potpuno <b>brisanje</b> je moguće samo ako doktor nikad nije imao nijedan termin (npr. dodan greškom).
+                    @if (total > 0) { <span>Ovaj doktor ima <b>@total</b> termina u evidenciji, pa se ne može obrisati.</span> }
+                </p>
+                @if (total == 0)
+                {
+                    <form method="post" asp-action="DeleteDoctor" asp-route-id="@doctor.Id" data-confirm="Trajno obrisati doktora @doctor.Name?">
+                        <button class="btn danger" type="submit">Obriši doktora</button>
+                    </form>
+                }
+                else
+                {
+                    <button class="btn danger" type="button" disabled style="opacity:.45;cursor:not-allowed">Obriši doktora</button>
+                }
+            </section>
+        </div>
+    }
+</div>

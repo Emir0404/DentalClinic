@@ -1,0 +1,40 @@
+@model List<Service>
+@{
+    ViewData["Title"] = "Usluge";
+    ViewData["Description"] = "Pregled, čišćenje kamenca, plombe, liječenje kanala, izbjeljivanje, implantati, ortodoncija i dječja stomatologija. Sve usluge s cijenama i opisom.";
+    var groups = Model.GroupBy(s => s.Category).ToList();
+}
+<section class="page-head">
+    <div class="container">
+        <div class="crumbs"><a href="/">Početna</a> / Usluge</div>
+        <h1>Naše usluge</h1>
+        <p>Za svaku uslugu možete pročitati šta je to, kako izgleda zahvat, koliko traje i šta košta. Bez iznenađenja.</p>
+    </div>
+</section>
+
+<section class="section tight">
+    <div class="container">
+        @foreach (var g in groups)
+        {
+            <h2 style="font-size:1.6rem;margin:2.4rem 0 1.2rem">@g.Key</h2>
+            <div class="cards">
+                @foreach (var s in g)
+                {
+                    <a class="card reveal" href="/usluge/@s.Slug">
+                        <div class="card-img"><img src="@s.ImageUrl" alt="@s.Name" loading="lazy" width="600" height="375" /></div>
+                        <div class="card-body">
+                            <h3>@s.Name</h3>
+                            <p>@s.Summary</p>
+                            <div class="card-meta"><span><svg class="ic"><use href="#i-clock"/></svg> @s.DurationText</span><span>@s.PriceText</span></div>
+                        </div>
+                    </a>
+                }
+            </div>
+        }
+
+        <div class="cta reveal" style="margin-top:4rem">
+            <div><h2>Niste sigurni šta vam treba?</h2><p>Počnite s pregledom. Doktor će vam objasniti šta je potrebno i napisati plan s cijenom.</p></div>
+            <a class="btn btn-light" href="/zakazivanje?usluga=pregled">Zakaži pregled</a>
+        </div>
+    </div>
+</section>

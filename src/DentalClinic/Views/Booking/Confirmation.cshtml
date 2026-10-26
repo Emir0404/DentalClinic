@@ -1,0 +1,65 @@
+@model Appointment
+@{
+    var cancelled = Model.Status == AppointmentStatus.Cancelled;
+    ViewData["Title"] = cancelled ? "Termin otkazan" : "Termin potvrđen";
+    var culture = ClinicInfo.Culture;
+    var canCancel = ViewBag.CanCancel is true;
+}
+<section class="page-head">
+    <div class="container">
+        <span class="eyebrow light">@(cancelled ? "Otkazano" : "Termin zakazan")</span>
+        <h1>@(cancelled ? "Termin je otkazan" : "Vidimo se uskoro!")</h1>
+        <p>@(cancelled ? "Ako se predomislite, uvijek možete zakazati novi termin." : $"Hvala, {Model.PatientName.Split(' ')[0]}. Sačuvajte šifru termina: trebat će vam za pregled ili otkazivanje.")</p>
+    </div>
+</section>
+
+<section class="section tight">
+    <div class="container narrow">
+        @if (TempData["Ok"] is string ok) { <div class="alert ok" role="status">@ok</div> }
+        @if (TempData["Error"] is string error) { <div class="alert err" role="alert">@error</div> }
+
+        <div class="ticket @(cancelled ? "cancelled" : "")">
+            <div class="ticket-top">
+                <div><span>Šifra termina</span><b>@Model.Reference</b></div>
+                <svg class="ic" style="width:44px;height:44px;opacity:.9"><use href="#i-@(cancelled ? "alert" : "check")"/></svg>
+            </div>
+            <dl>
+                <div><dt>Usluga</dt><dd>@Model.Service.Name</dd></div>
+                <div><dt>Datum</dt><dd>@Model.Start.ToString("dddd, d. MMMM yyyy.", culture)</dd></div>
+                <div><dt>Vrijeme</dt><dd>@Model.Start.ToString("HH:mm") – @Model.End.ToString("HH:mm") h</dd></div>
+                <div><dt>Doktor</dt><dd>@Model.Doctor.Name</dd></div>
+                <div><dt>Pacijent</dt><dd>@Model.PatientName · @Model.Phone</dd></div>
+                <div><dt>Adresa</dt><dd>@ClinicInfo.Address</dd></div>
+                <div style="border:0"><dt>Cijena</dt><dd>@Model.Service.PriceText <span class="muted small" style="font-weight:500">(orijentaciono, plaća se u ordinaciji)</span></dd></div>
+            </dl>
+            <div class="ticket-actions">
+                @if (!cancelled)
+                {
+                    <a class="btn btn-teal btn-sm" asp-action="Calendar" asp-route-token="@Model.AccessToken"><svg class="ic"><use href="#i-calendar"/></svg> Dodaj u kalendar</a>
+                    <button class="btn btn-outline btn-sm" type="button" data-print>Isprintaj</button>
+                }
+                @if (canCancel)
+                {
+                    <form method="post" asp-action="Cancel" asp-route-token="@Model.AccessToken" data-confirm="Sigurno želite otkazati termin?">
+                        <button class="btn btn-sm" style="border-color:var(--danger);color:var(--danger)" type="submit">Otkaži termin</button>
+                    </form>
+                }
+                @if (cancelled) { <a class="btn btn-primary btn-sm" href="/zakazivanje">Zakaži novi termin</a> }
+            </div>
+        </div>
+
+        @if (!cancelled)
+        {
+            <div class="prep">
+                <h3>Prije dolaska</h3>
+                <ul>
+                    <li>Dođite 10 minuta ranije@(Model.FirstVisit ? ", jer popunjavamo kratak zdravstveni upitnik" : "")</li>
+                    <li>Ponesite spisak lijekova koje uzimate i raniji nalaz ili snimak, ako ga imate</li>
+                    <li>Operite zube prije dolaska</li>
+                    @if (!canCancel) { <li>Termin više nije moguće otkazati putem sajta. Ako ne možete doći, nazovite nas: <a href="tel:@ClinicInfo.PhoneLink">@ClinicInfo.Phone</a></li> }
+                    else { <li>Termin možete besplatno otkazati do 24 sata prije dolaska</li> }
+                </ul>
+            </div>
+        }
+    </div>
+</section>

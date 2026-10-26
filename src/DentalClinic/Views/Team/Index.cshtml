@@ -1,0 +1,37 @@
+@model List<Doctor>
+@{
+    ViewData["Title"] = "Naš tim";
+    ViewData["Description"] = "Upoznajte doktore stomatologije, specijaliste oralne hirurgije, implantologije i ortodoncije u ordinaciji Osmijeh u Sarajevu.";
+}
+<section class="page-head">
+    <div class="container">
+        <div class="crumbs"><a href="/">Početna</a> / Naš tim</div>
+        <h1>Naš tim</h1>
+        <p>Četiri doktora, svaki sa svojom oblašću. Zajedno pokrivamo sve od prvog pregleda do implantata.</p>
+    </div>
+</section>
+
+<section class="section tight">
+    <div class="container">
+        @foreach (var d in Model)
+        {
+            <article class="team-row reveal" id="@d.Slug">
+                <div class="doctor-photo"><img src="@d.PhotoUrl" alt="@d.Name" loading="lazy" width="350" height="437" /></div>
+                <div>
+                    <span class="eyebrow">@d.YearsExperience godina iskustva</span>
+                    <h2 style="font-size:2rem;margin-bottom:.2rem">@d.Name</h2>
+                    <p style="color:var(--teal);font-weight:700">@d.Title</p>
+                    <p>@d.Bio</p>
+                    <h3 style="font-size:1rem;margin:1.4rem 0 0;font-family:var(--sans);font-weight:700">Šta radi</h3>
+                    <ul class="chips">
+                        @foreach (var s in d.Services.Select(x => x.Service).Where(x => x.IsActive).OrderBy(x => x.SortOrder))
+                        {
+                            <li><a href="/usluge/@s.Slug">@s.Name</a></li>
+                        }
+                    </ul>
+                    <p style="margin-top:1.6rem"><a class="btn btn-primary btn-sm" href="/zakazivanje">Zakaži kod doktora</a></p>
+                </div>
+            </article>
+        }
+    </div>
+</section>

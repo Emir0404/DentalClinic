@@ -1,0 +1,102 @@
+@model BookingViewModel
+@{
+    ViewData["Title"] = "Zakaži termin";
+    ViewData["Description"] = "Zakažite termin kod zubara online: odaberite uslugu, doktora i vrijeme. Potvrda odmah, besplatno otkazivanje do 24 sata prije.";
+    var f = Model.Form;
+    var initial = System.Text.Json.JsonSerializer.Serialize(new
+    {
+        service = f.Service, doctor = f.Doctor, date = f.Date?.ToString("yyyy-MM-dd"), time = f.Time,
+    });
+}
+<section class="page-head">
+    <div class="container">
+        <div class="crumbs"><a href="/">Početna</a> / Zakaži termin</div>
+        <h1>Zakaži termin</h1>
+        <p>Četiri jednostavna koraka. Potvrdu dobijate odmah, a termin možete besplatno otkazati do 24 sata prije dolaska.</p>
+    </div>
+</section>
+
+<section class="section tight">
+    <form method="post" class="container booking" id="bookingForm" data-initial="@initial" data-max-days="@ClinicRules.MaxDaysAhead">
+        <noscript><div class="alert err">Za online zakazivanje potreban je uključen JavaScript. Možete nas i nazvati: <a href="tel:@ClinicInfo.PhoneLink">@ClinicInfo.Phone</a>.</div></noscript>
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Date" id="fDate" value="@f.Date?.ToString("yyyy-MM-dd")" />
+        <input type="hidden" name="Time" id="fTime" value="@f.Time" />
+
+        <div>
+            @if (Model.Error is not null)
+            {
+                <div class="alert err" role="alert">@Model.Error</div>
+            }
+            else if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert err" role="alert">Molimo provjerite označena polja.</div>
+            }
+
+            <div class="bstep" id="step1">
+                <h2><span>1</span> Šta vam treba?</h2>
+                <div class="service-pick">
+                    @foreach (var s in Model.Services)
+                    {
+                        <label class="pick">
+                            <input type="radio" name="Service" value="@s.Slug" checked="@(f.Service == s.Slug)"
+                                   data-name="@s.Name" data-duration="@s.DurationText" data-price="@s.PriceText" />
+                            <b>@s.Name</b>
+                            <small>@s.Category</small>
+                            <span class="m"><span>@s.DurationText</span><span>@s.PriceText</span></span>
+                        </label>
+                    }
+                </div>
+                @Html.ValidationMessage("Service", new { @class = "field-error" })
+            </div>
+
+            <div class="bstep" id="step2" hidden>
+                <h2><span>2</span> Kod koga?</h2>
+                <div class="doctor-pick" id="doctorPick"><span class="loading">Učitavam doktore…</span></div>
+            </div>
+
+            <div class="bstep" id="step3" hidden>
+                <h2><span>3</span> Kada vam odgovara?</h2>
+                <div class="days" id="days" role="group" aria-label="Datum"></div>
+                <button class="btn btn-outline btn-sm" type="button" id="moreDays" hidden>Prikaži kasnije datume</button>
+                <div class="label" style="margin-top:1rem" id="timesLabel" hidden>Slobodna vremena</div>
+                <div class="times" id="times" role="group" aria-label="Vrijeme"></div>
+                <p class="slot-hint" id="slotHint">Odaberite datum da vidite slobodna vremena.</p>
+                @Html.ValidationMessage("Date", new { @class = "field-error" })
+                @Html.ValidationMessage("Time", new { @class = "field-error" })
+            </div>
+
+            <div class="bstep" id="step4" hidden>
+                <h2><span>4</span> Vaši podaci</h2>
+                <div class="grid-2">
+                    <div class="field"><label for="PatientName">Ime i prezime</label><input id="PatientName" name="PatientName" value="@f.PatientName" autocomplete="name" required maxlength="100" />@Html.ValidationMessage("PatientName", new { @class = "field-error" })</div>
+                    <div class="field"><label for="Phone">Telefon</label><input id="Phone" name="Phone" type="tel" value="@f.Phone" autocomplete="tel" required maxlength="40" placeholder="+387 61 123 456" />@Html.ValidationMessage("Phone", new { @class = "field-error" })</div>
+                </div>
+                <div class="field"><label for="Email">Email (za potvrdu i otkazivanje)</label><input id="Email" name="Email" type="email" value="@f.Email" autocomplete="email" required maxlength="150" />@Html.ValidationMessage("Email", new { @class = "field-error" })</div>
+                <div class="field"><label for="Notes">Napomena (nije obavezno)</label><textarea id="Notes" name="Notes" rows="3" maxlength="600" placeholder="Npr. imam osjetljive zube, bojim se injekcija, uzimam lijekove za razrjeđivanje krvi…">@f.Notes</textarea></div>
+                <label class="check"><input type="checkbox" name="FirstVisit" value="true" checked="@f.FirstVisit" /><span>Ovo je moj prvi dolazak u ordinaciju</span></label>
+                <input type="hidden" name="FirstVisit" value="false" />
+                <label class="check"><input type="checkbox" name="Consent" value="true" required checked="@f.Consent" /><span>Saglasan/saglasna sam da ordinacija obrađuje moje podatke radi zakazivanja termina. <a href="/privatnost" target="_blank">Privatnost</a></span></label>
+                @Html.ValidationMessage("Consent", new { @class = "field-error" })
+            </div>
+        </div>
+
+        <aside class="summary" aria-live="polite">
+            <h3>Vaš termin</h3>
+            <dl>
+                <div><dt>Usluga</dt><dd id="sService">–</dd></div>
+                <div><dt>Doktor</dt><dd id="sDoctor">–</dd></div>
+                <div><dt>Datum</dt><dd id="sDate">–</dd></div>
+                <div><dt>Vrijeme</dt><dd id="sTime">–</dd></div>
+                <div><dt>Trajanje</dt><dd id="sDuration">–</dd></div>
+                <div><dt>Cijena</dt><dd id="sPrice">–</dd></div>
+            </dl>
+            <button class="btn btn-primary btn-block" type="submit" id="submitBtn" disabled>Potvrdi termin</button>
+            <p class="help" style="margin:.9rem 0 0">Plaćate tek u ordinaciji. Cijena je orijentaciona, a tačnu određuje doktor nakon pregleda.</p>
+        </aside>
+    </form>
+</section>
+
+@section Scripts {
+    <script src="~/js/booking.js" asp-append-version="true"></script>
+}

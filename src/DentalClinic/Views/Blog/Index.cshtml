@@ -1,0 +1,36 @@
+@model List<Article>
+@{
+    ViewData["Title"] = "Savjeti";
+    ViewData["Description"] = "Korisni savjeti stomatologa: pranje zuba, izbjeljivanje, dječji zubi, implantati, ortodoncija i prva pomoć kod zubobolje.";
+    var categories = (List<string>)ViewBag.Categories;
+    var current = ViewBag.Category as string;
+}
+<section class="page-head">
+    <div class="container">
+        <div class="crumbs"><a href="/">Početna</a> / Savjeti</div>
+        <h1>Savjeti i članci</h1>
+        <p>Odgovori na pitanja koja nam pacijenti najčešće postavljaju, napisani običnim jezikom.</p>
+    </div>
+</section>
+<section class="section tight">
+    <div class="container">
+        <div class="filters">
+            <a href="/savjeti" class="@(string.IsNullOrEmpty(current) ? "on" : "")">Sve</a>
+            @foreach (var c in categories) { <a href="/savjeti?category=@Uri.EscapeDataString(c)" class="@(c == current ? "on" : "")">@c</a> }
+        </div>
+        <div class="cards">
+            @foreach (var a in Model)
+            {
+                <a class="card reveal" href="/savjeti/@a.Slug">
+                    <div class="card-img"><img src="@a.ImageUrl" alt="@a.Title" loading="lazy" width="600" height="375" /></div>
+                    <div class="card-body">
+                        <span class="tag">@a.Category</span>
+                        <h3>@a.Title</h3>
+                        <p>@a.Excerpt</p>
+                        <div class="card-meta"><span>@a.PublishedAt.ToString("d. MMMM yyyy.", ClinicInfo.Culture)</span><span>@a.ReadMinutes min čitanja</span></div>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+</section>

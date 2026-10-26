@@ -1,0 +1,31 @@
+@model List<Service>
+@{
+    ViewData["Title"] = "Usluge i cijene";
+    var upcoming = (Dictionary<int, int>)ViewBag.Upcoming;
+}
+<header class="page-title">
+    <h1>Usluge i cijene</h1>
+    <a class="btn primary" asp-action="NewService">+ Nova usluga</a>
+</header>
+<section class="panel">
+    <p class="muted small">Promjena trajanja ili cijene važi za nove termine. Već zakazani termini zadržavaju staro trajanje. Neaktivna usluga nestaje sa sajta i iz zakazivanja.</p>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Usluga</th><th>Kategorija</th><th>Trajanje</th><th>Cijena</th><th>Budući termini</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var s in Model)
+            {
+                <tr class="@(s.IsActive ? "" : "dim")">
+                    <td><b>@s.Name</b></td>
+                    <td>@s.Category</td>
+                    <td>@s.DurationText</td>
+                    <td>@s.PriceText</td>
+                    <td>@(upcoming.GetValueOrDefault(s.Id))</td>
+                    <td><span class="badge @(s.IsActive ? "st-confirmed" : "st-cancelled")">@(s.IsActive ? "Aktivna" : "Neaktivna")</span></td>
+                    <td class="r"><a class="btn sm" asp-action="EditService" asp-route-id="@s.Id">Uredi</a></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

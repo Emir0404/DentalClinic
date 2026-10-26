@@ -1,0 +1,45 @@
+@model Article
+@{
+    ViewData["Title"] = Model.Title;
+    ViewData["Description"] = Model.Excerpt;
+    ViewData["Image"] = Model.ImageUrl;
+    var related = (List<Article>)ViewBag.Related;
+}
+<section class="page-head" style="padding-bottom:7rem">
+    <div class="container narrow">
+        <div class="crumbs"><a href="/">Početna</a> / <a href="/savjeti">Savjeti</a></div>
+        <span class="eyebrow light">@Model.Category</span>
+        <h1 style="font-size:clamp(2rem,4.2vw,3rem)">@Model.Title</h1>
+        <p>@Model.PublishedAt.ToString("d. MMMM yyyy.", ClinicInfo.Culture) · @Model.ReadMinutes min čitanja</p>
+    </div>
+</section>
+<div class="container narrow">
+    <div class="article-hero"><img src="@Model.ImageUrl" alt="@Model.Title" width="900" height="450" /></div>
+    <article class="article">@ArticleFormatter.ToHtml(Model.Body)</article>
+
+    <div class="note" style="margin:2.5rem 0">
+        Ovaj tekst je opšteg karaktera i ne zamjenjuje pregled kod doktora. Ako imate tegobe, <a href="/zakazivanje">zakažite termin</a>.
+    </div>
+    <div class="cta" style="margin-bottom:3rem">
+        <div><h2 style="font-size:1.6rem">Želite da vam doktor pogleda zube?</h2></div>
+        <a class="btn btn-light" href="/zakazivanje">Zakaži termin</a>
+    </div>
+</div>
+
+@if (related.Count > 0)
+{
+    <section class="section tint">
+        <div class="container">
+            <h2 style="font-size:1.8rem">Pročitajte još</h2>
+            <div class="cards">
+                @foreach (var a in related)
+                {
+                    <a class="card" href="/savjeti/@a.Slug">
+                        <div class="card-img"><img src="@a.ImageUrl" alt="@a.Title" loading="lazy" /></div>
+                        <div class="card-body"><span class="tag">@a.Category</span><h3>@a.Title</h3></div>
+                    </a>
+                }
+            </div>
+        </div>
+    </section>
+}

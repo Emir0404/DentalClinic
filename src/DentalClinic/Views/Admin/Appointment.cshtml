@@ -1,0 +1,59 @@
+@model Appointment
+@{
+    ViewData["Title"] = "Termin " + Model.Reference;
+    var culture = ClinicInfo.Culture;
+    var s = Model.Status;
+}
+<header class="page-title">
+    <div>
+        <a class="back" asp-action="Appointments">← Svi termini</a>
+        <h1>@Model.Reference <partial name="_Status" model="Model.Status" /></h1>
+    </div>
+    <div class="actions">
+        @if (s == AppointmentStatus.Scheduled)
+        {
+            <form method="post" asp-action="SetStatus" asp-route-id="@Model.Id"><input type="hidden" name="status" value="@AppointmentStatus.Confirmed" /><button class="btn primary" type="submit">Potvrdi</button></form>
+        }
+        @if (s is AppointmentStatus.Scheduled or AppointmentStatus.Confirmed)
+        {
+            <form method="post" asp-action="SetStatus" asp-route-id="@Model.Id"><input type="hidden" name="status" value="@AppointmentStatus.Completed" /><button class="btn" type="submit">Završeno</button></form>
+            <form method="post" asp-action="SetStatus" asp-route-id="@Model.Id"><input type="hidden" name="status" value="@AppointmentStatus.NoShow" /><button class="btn" type="submit">Nije došao/la</button></form>
+            <form method="post" asp-action="SetStatus" asp-route-id="@Model.Id" data-confirm="Otkazati ovaj termin?"><input type="hidden" name="status" value="@AppointmentStatus.Cancelled" /><button class="btn danger" type="submit">Otkaži</button></form>
+        }
+        @if (s is AppointmentStatus.Cancelled or AppointmentStatus.NoShow)
+        {
+            <form method="post" asp-action="SetStatus" asp-route-id="@Model.Id"><input type="hidden" name="status" value="@AppointmentStatus.Scheduled" /><button class="btn primary" type="submit">Vrati u zakazano</button></form>
+        }
+    </div>
+</header>
+
+<div class="two-col">
+    <section class="panel">
+        <h2>Termin</h2>
+        <dl class="details">
+            <div><dt>Usluga</dt><dd>@Model.Service.Name</dd></div>
+            <div><dt>Doktor</dt><dd>@Model.Doctor.Name</dd></div>
+            <div><dt>Datum</dt><dd>@Model.Start.ToString("dddd, dd.MM.yyyy.", culture)</dd></div>
+            <div><dt>Vrijeme</dt><dd>@Model.Start.ToString("HH:mm") – @Model.End.ToString("HH:mm") (@Model.DurationMinutes min)</dd></div>
+            <div><dt>Cijena usluge</dt><dd>@Model.Service.PriceText</dd></div>
+            <div><dt>Zakazano</dt><dd>@Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy. HH:mm")</dd></div>
+            @if (Model.CancelledAt is { } c) { <div><dt>Otkazano</dt><dd>@c.ToLocalTime().ToString("dd.MM.yyyy. HH:mm")</dd></div> }
+        </dl>
+    </section>
+
+    <section class="panel">
+        <h2>Pacijent</h2>
+        <dl class="details">
+            <div><dt>Ime</dt><dd>@Model.PatientName @(Model.FirstVisit ? "(prvi put)" : "")</dd></div>
+            <div><dt>Telefon</dt><dd><a href="tel:@Model.Phone">@Model.Phone</a></dd></div>
+            <div><dt>Email</dt><dd><a href="mailto:@Model.Email">@Model.Email</a></dd></div>
+            @if (!string.IsNullOrWhiteSpace(Model.Notes)) { <div><dt>Napomena pacijenta</dt><dd>@Model.Notes</dd></div> }
+        </dl>
+
+        <h2 style="margin-top:1.6rem">Interna bilješka</h2>
+        <form method="post" asp-action="Note" asp-route-id="@Model.Id">
+            <textarea name="note" rows="4" maxlength="500" placeholder="Vidi samo osoblje (npr. 'alergija na penicilin', 'plaća fakturom')">@Model.StaffNote</textarea>
+            <button class="btn" type="submit" style="margin-top:.6rem">Sačuvaj bilješku</button>
+        </form>
+    </section>
+</div>

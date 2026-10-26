@@ -1,0 +1,12 @@
+@{ ViewData["Title"] = "Prijava"; }
+<form method="post" asp-action="Login" class="login-card">
+    <div class="login-brand">Osmijeh<small>admin panel</small></div>
+    @if (ViewBag.Error is string error) { <div class="flash err" role="alert">@error</div> }
+    <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+    <label for="username">Korisničko ime</label>
+    <input id="username" name="username" autocomplete="username" required autofocus />
+    <label for="password">Lozinka</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required />
+    <button class="btn primary" type="submit">Prijavi se</button>
+    <a class="back" href="/">← Nazad na javni sajt</a>
+</form>

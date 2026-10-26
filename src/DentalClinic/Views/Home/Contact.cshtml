@@ -1,0 +1,57 @@
+@model ContactMessage
+@{
+    ViewData["Title"] = "Kontakt";
+    ViewData["Description"] = "Kontakt i radno vrijeme ordinacije Osmijeh u Sarajevu. Pošaljite poruku, pozovite nas ili zakažite termin online.";
+    var sent = TempData["Sent"] is true;
+}
+<section class="page-head">
+    <div class="container">
+        <div class="crumbs"><a href="/">Početna</a> / Kontakt</div>
+        <h1>Kontakt</h1>
+        <p>Pitanje, sumnja ili hitan slučaj? Javite nam se, odgovaramo istog radnog dana.</p>
+    </div>
+</section>
+<section class="section tight">
+    <div class="container contact-grid">
+        <div>
+            <ul class="info-list">
+                <li><span class="ico"><svg class="ic"><use href="#i-pin"/></svg></span><div><b>Adresa</b>@ClinicInfo.Address<br /><span class="muted small">Prizemlje, parking u dvorištu</span></div></li>
+                <li><span class="ico"><svg class="ic"><use href="#i-phone"/></svg></span><div><b>Telefon</b><a href="tel:@ClinicInfo.PhoneLink">@ClinicInfo.Phone</a></div></li>
+                <li><span class="ico"><svg class="ic"><use href="#i-mail"/></svg></span><div><b>Email</b><a href="mailto:@ClinicInfo.Email">@ClinicInfo.Email</a></div></li>
+            </ul>
+
+            <h3 style="margin-top:2rem">Radno vrijeme</h3>
+            <table class="hours">
+                <tr><td>Ponedjeljak – petak</td><td>08:00 – 19:00</td></tr>
+                <tr><td>Subota</td><td>09:00 – 13:00</td></tr>
+                <tr><td>Nedjelja</td><td>zatvoreno</td></tr>
+            </table>
+
+            <div class="emergency" style="margin-top:2rem">
+                <h3>Hitan slučaj?</h3>
+                <p style="margin:0 0 .5rem">Jaka bol, otok ili povreda zuba. Nazovite odmah:</p>
+                <a href="tel:@ClinicInfo.PhoneLink">@ClinicInfo.Phone</a>
+            </div>
+            <p style="margin-top:1.4rem"><a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=Zmaja+od+Bosne+12+Sarajevo"><svg class="ic"><use href="#i-pin"/></svg> Otvori u Google Mapama</a></p>
+        </div>
+
+        <div class="form-card">
+            @if (sent)
+            {
+                <div class="alert ok" role="status"><b>Hvala!</b> Poruka je poslana. Javit ćemo vam se uskoro.</div>
+            }
+            <h2 style="font-size:1.8rem">Pošaljite poruku</h2>
+            <form method="post" asp-action="Contact" novalidate>
+                <div class="field"><label asp-for="Name">Ime i prezime</label><input asp-for="Name" autocomplete="name" /><span class="field-error" asp-validation-for="Name"></span></div>
+                <div class="grid-2">
+                    <div class="field"><label asp-for="Email">Email</label><input asp-for="Email" type="email" autocomplete="email" /><span class="field-error" asp-validation-for="Email"></span></div>
+                    <div class="field"><label asp-for="Phone">Telefon (nije obavezno)</label><input asp-for="Phone" type="tel" autocomplete="tel" /></div>
+                </div>
+                <div class="field"><label asp-for="Message">Poruka</label><textarea asp-for="Message" rows="5"></textarea><span class="field-error" asp-validation-for="Message"></span></div>
+                <label class="check"><input type="checkbox" name="consent" value="true" /><span>Saglasan/saglasna sam da ordinacija koristi moje podatke samo da odgovori na ovu poruku. <a href="/privatnost">Privatnost</a></span></label>
+                @Html.ValidationMessage("consent", new { @class = "field-error" })
+                <button class="btn btn-primary btn-block" type="submit">Pošalji poruku</button>
+            </form>
+        </div>
+    </div>
+</section>

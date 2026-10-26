@@ -1,0 +1,232 @@
+@model HomeViewModel
+@{
+    ViewData["Description"] = "Dental Studio Osmijeh: moderna stomatološka ordinacija u Sarajevu. Online zakazivanje, cijena unaprijed, blag pristup odraslima i djeci.";
+    var bs = ClinicInfo.Culture;
+    var quotes = new[]
+    {
+        ("Amra H.", "Imala sam veliki strah od zubara, a ovdje sam prvi put otišla bez treme. Doktorica je sve objasnila prije nego što je počela, a ja ništa nisam osjetila.", "Liječenje karijesa"),
+        ("Emir M.", "Zakazao sam online za dvije minute, stigao na vrijeme i bio gotov kad je pisalo. Cijena je bila tačno ona koju su mi rekli na pregledu.", "Izbjeljivanje zuba"),
+        ("Selma K.", "Moj sin je jedva čekao da ponovo ide kod doktora Adnana. Ko bi rekao da ću ovo ikad napisati o zubaru za petogodišnjaka.", "Dječja stomatologija"),
+    };
+}
+@section Head {
+    <script type="application/ld+json">
+    {
+      "@@context": "https://schema.org",
+      "@@type": "Dentist",
+      "name": "@ClinicInfo.Name",
+      "image": "/img/hero.jpg",
+      "telephone": "@ClinicInfo.Phone",
+      "email": "@ClinicInfo.Email",
+      "address": { "@@type": "PostalAddress", "streetAddress": "Zmaja od Bosne 12", "addressLocality": "Sarajevo", "postalCode": "71000", "addressCountry": "BA" },
+      "openingHoursSpecification": [
+        { "@@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "08:00", "closes": "19:00" },
+        { "@@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "09:00", "closes": "13:00" }
+      ]
+    }
+    </script>
+}
+
+<section class="hero">
+    <div class="hero-bg" style="background-image:url('/img/hero.jpg')" role="img" aria-label="Doktor razgovara s pacijentom u modernoj ordinaciji"></div>
+    <div class="container">
+        <span class="eyebrow light">Stomatološka ordinacija · Sarajevo</span>
+        <h1>Osmijeh kojim ćete se <em>ponositi</em></h1>
+        <p class="lead">Blag pristup, moderna oprema i jasna cijena prije svakog zahvata. Zakažite termin online za dvije minute.</p>
+        <div class="hero-actions">
+            <a class="btn btn-primary" href="/zakazivanje"><svg class="ic"><use href="#i-calendar"/></svg> Zakaži termin</a>
+            <a class="btn btn-ghost-light" href="/usluge">Pogledaj usluge</a>
+        </div>
+        <div class="trust">
+            <span><svg class="ic"><use href="#i-shield"/></svg> Cijena unaprijed</span>
+            <span><svg class="ic"><use href="#i-heart"/></svg> Liječenje bez bola</span>
+            <span><svg class="ic"><use href="#i-sparkle"/></svg> Sterilizacija po standardu</span>
+        </div>
+    </div>
+</section>
+
+<section class="quick">
+    <div class="container">
+        <form class="quick-card" method="get" action="/zakazivanje">
+            <h2>Brzo zakazivanje</h2>
+            <div>
+                <label for="q-service">Šta vam treba?</label>
+                <select id="q-service" name="usluga">
+                    @foreach (var s in Model.Services)
+                    {
+                        <option value="@s.Slug">@s.Name</option>
+                    }
+                </select>
+            </div>
+            <button class="btn btn-primary" type="submit">Pronađi termin <svg class="ic"><use href="#i-arrow"/></svg></button>
+        </form>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-head center reveal">
+            <span class="eyebrow">Zašto Osmijeh</span>
+            <h2>Zubar kod kojeg se ne treba plašiti</h2>
+            <p>Znamo da većina ljudi ne voli zubare. Zato smo ordinaciju gradili oko jedne ideje: da se osjećate sigurno, informisano i bez pritiska.</p>
+        </div>
+        <div class="features">
+            <div class="feature reveal"><div class="ico"><svg class="ic"><use href="#i-heart"/></svg></div><h3>Blag pristup</h3><p>Anestetički gel prije svake injekcije, mirna atmosfera i pauza kad god kažete "stani".</p></div>
+            <div class="feature reveal"><div class="ico"><svg class="ic"><use href="#i-euro"/></svg></div><h3>Cijena unaprijed</h3><p>Nakon pregleda dobijate pisani plan s cijenom. Ništa se ne radi bez vašeg odobrenja.</p></div>
+            <div class="feature reveal"><div class="ico"><svg class="ic"><use href="#i-shield"/></svg></div><h3>Sterilizacija i sigurnost</h3><p>Instrumenti se sterilišu u autoklavu i pakuju pojedinačno, a za svakog pacijenta otvaramo novi komplet.</p></div>
+            <div class="feature reveal"><div class="ico"><svg class="ic"><use href="#i-clock"/></svg></div><h3>Poštujemo vaše vrijeme</h3><p>Zakazani termin znači da vas čeka doktor, a ne čekaonica. Podsjetnik stiže prije dolaska.</p></div>
+        </div>
+    </div>
+</section>
+
+<section class="section tint">
+    <div class="container">
+        <div class="section-head reveal">
+            <span class="eyebrow">Naše usluge</span>
+            <h2>Sve za zdrav osmijeh na jednom mjestu</h2>
+            <p>Od običnog pregleda do implantata. Kliknite na uslugu da vidite kako izgleda zahvat, koliko traje i šta košta.</p>
+        </div>
+        <div class="cards">
+            @foreach (var s in Model.Services.Take(6))
+            {
+                <a class="card reveal" href="/usluge/@s.Slug">
+                    <div class="card-img"><img src="@s.ImageUrl" alt="@s.Name" loading="lazy" width="600" height="375" /></div>
+                    <div class="card-body">
+                        <span class="tag">@s.Category</span>
+                        <h3>@s.Name</h3>
+                        <p>@s.Summary</p>
+                        <div class="card-meta"><span><svg class="ic"><use href="#i-clock"/></svg> @s.DurationText</span><span>@s.PriceText</span></div>
+                    </div>
+                </a>
+            }
+        </div>
+        <p class="center" style="margin-top:2.4rem"><a class="btn btn-outline" href="/usluge">Sve usluge i cijene <svg class="ic"><use href="#i-arrow"/></svg></a></p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container split">
+        <div class="reveal">
+            <span class="eyebrow">Kako funkcioniše</span>
+            <h2>Od zakazivanja do osmijeha u tri koraka</h2>
+            <div class="steps" style="grid-template-columns:1fr;gap:1.6rem;margin-top:2rem">
+                <div class="step"><h3>Zakažite online</h3><p>Odaberite uslugu, doktora i vrijeme koje vam odgovara. Dobijete šifru i podsjetnik.</p></div>
+                <div class="step"><h3>Pregled i plan</h3><p>Doktor pregleda, objasni nalaz na ekranu i napiše plan s cijenom. Vi odlučujete.</p></div>
+                <div class="step"><h3>Liječenje bez stresa</h3><p>Radimo uz anesteziju i pauze po potrebi. Nakon zahvata dobijate pisane upute.</p></div>
+            </div>
+        </div>
+        <img class="reveal" src="/img/clinic-bright.jpg" alt="Svijetla i čista ordinacija s modernom opremom" loading="lazy" width="700" height="560" style="aspect-ratio:5/4" />
+    </div>
+</section>
+
+<section class="section dark">
+    <div class="container stats">
+        <div><b>15+</b><span>godina iskustva</span></div>
+        <div><b>4</b><span>doktora specijalista</span></div>
+        <div><b>11</b><span>usluga na jednom mjestu</span></div>
+        <div><b>24 h</b><span>besplatno otkazivanje</span></div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-head center reveal">
+            <span class="eyebrow">Naš tim</span>
+            <h2>Ljudi kojima ćete povjeriti osmijeh</h2>
+            <p>Svaki doktor ima svoju oblast, pa dobijate stručnjaka baš za ono što vam treba.</p>
+        </div>
+        <div class="team">
+            @foreach (var d in Model.Doctors)
+            {
+                <div class="doctor reveal">
+                    <div class="doctor-photo"><img src="@d.PhotoUrl" alt="@d.Name" loading="lazy" width="350" height="437" /></div>
+                    <div class="doctor-body">
+                        <h3>@d.Name</h3>
+                        <p class="role">@d.Title</p>
+                        <p class="bio">@d.YearsExperience godina iskustva</p>
+                    </div>
+                </div>
+            }
+        </div>
+        <p class="center" style="margin-top:2.2rem"><a class="btn btn-outline" href="/tim">Upoznajte tim</a></p>
+    </div>
+</section>
+
+<section class="section tint">
+    <div class="container">
+        <div class="gallery reveal">
+            <img class="big" src="/img/team-work.jpg" alt="Dva doktora u zaštitnoj opremi rade zahvat" loading="lazy" />
+            <img src="/img/clinic-chair.jpg" alt="Stomatološka stolica u svijetloj ordinaciji" loading="lazy" />
+            <img src="/img/xray.jpg" alt="Doktor analizira rendgenski snimak" loading="lazy" />
+            <img src="/img/waiting-room.jpg" alt="Ugodna čekaonica" loading="lazy" />
+            <img src="/img/consult.jpg" alt="Doktor objašnjava pacijentu nalaz na ekranu" loading="lazy" />
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-head center reveal">
+            <span class="eyebrow">Iskustva pacijenata</span>
+            <h2>Šta kažu oni koji su već bili kod nas</h2>
+        </div>
+        <div class="quotes">
+            @foreach (var (name, text, what) in quotes)
+            {
+                <figure class="quote reveal" style="margin:0">
+                    <div class="stars" aria-label="Ocjena 5 od 5">@for (var i = 0; i < 5; i++) { <svg class="ic"><use href="#i-star"/></svg> }</div>
+                    <p>„@text“</p>
+                    <footer><span class="avatar" style="display:grid;color:#fff">@name[0]</span><div>@name<span>@what</span></div></footer>
+                </figure>
+            }
+        </div>
+        <p class="center muted small" style="margin-top:1.5rem">Primjeri recenzija za demo sajt.</p>
+    </div>
+</section>
+
+<section class="section tint">
+    <div class="container">
+        <div class="section-head reveal">
+            <span class="eyebrow">Savjeti</span>
+            <h2>Korisno o zubima, bez komplikovanih riječi</h2>
+        </div>
+        <div class="cards">
+            @foreach (var a in Model.Articles)
+            {
+                <a class="card reveal" href="/savjeti/@a.Slug">
+                    <div class="card-img"><img src="@a.ImageUrl" alt="@a.Title" loading="lazy" width="600" height="375" /></div>
+                    <div class="card-body">
+                        <span class="tag">@a.Category</span>
+                        <h3>@a.Title</h3>
+                        <p>@a.Excerpt</p>
+                        <div class="card-meta"><span><svg class="ic"><use href="#i-clock"/></svg> @a.ReadMinutes min čitanja</span></div>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-head center reveal">
+            <span class="eyebrow">Česta pitanja</span>
+            <h2>Bojite se zubara? Niste jedini</h2>
+        </div>
+        <div class="faq reveal">
+            <details><summary>Da li će me boljeti?</summary><p>Ne treba. Prije svake injekcije stavljamo anestetički gel, a zahvate radimo uz dobru anesteziju. Ako u bilo kom trenutku osjetite bol, dignite ruku i stajemo.</p></details>
+            <details><summary>Mogu li saznati cijenu prije liječenja?</summary><p>Naravno. Nakon pregleda dobijate pisani plan s cijenom za svaku stavku. Ništa se ne radi bez vašeg odobrenja.</p></details>
+            <details><summary>Šta ako ne mogu doći na termin?</summary><p>Termin možete besplatno otkazati do 24 sata ranije, direktno preko sajta. Dovoljno je da imate šifru termina i email.</p></details>
+        </div>
+        <p class="center" style="margin-top:1.6rem"><a href="/pitanja">Sva pitanja i odgovori →</a></p>
+    </div>
+</section>
+
+<section class="section" style="padding-top:0">
+    <div class="container">
+        <div class="cta reveal">
+            <div><h2>Spremni za pregled?</h2><p>Termini se brzo popune. Odaberite vrijeme koje vam odgovara i dobijte potvrdu odmah.</p></div>
+            <a class="btn btn-light" href="/zakazivanje"><svg class="ic"><use href="#i-calendar"/></svg> Zakaži termin</a>
+        </div>
+    </div>
+</section>

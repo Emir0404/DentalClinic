@@ -1,0 +1,34 @@
+@model List<Service>
+@{
+    ViewData["Title"] = "Cjenovnik";
+    ViewData["Description"] = "Cjenovnik stomatoloških usluga: pregled, čišćenje, plombe, liječenje kanala, izbjeljivanje, krunice, implantati i ortodoncija.";
+}
+<section class="page-head">
+    <div class="container">
+        <div class="crumbs"><a href="/">Početna</a> / Cjenovnik</div>
+        <h1>Cjenovnik</h1>
+        <p>Orijentacione cijene u konvertibilnim markama. Tačnu cijenu dobijate nakon pregleda, prije početka liječenja.</p>
+    </div>
+</section>
+<section class="section tight">
+    <div class="container narrow" style="width:min(940px,100% - 40px)">
+        @foreach (var g in Model.GroupBy(s => s.Category))
+        {
+            <div class="price-group">
+                <h3>@g.Key</h3>
+                @foreach (var s in g)
+                {
+                    <div class="price-row">
+                        <div><b><a href="/usluge/@s.Slug" style="color:inherit;text-decoration:none">@s.Name</a></b><small>@s.Summary</small></div>
+                        <span class="d"><svg class="ic"><use href="#i-clock"/></svg> @s.DurationText</span>
+                        <span class="p">@s.PriceText</span>
+                        <a class="btn btn-outline btn-sm" href="/zakazivanje?usluga=@s.Slug">Zakaži</a>
+                    </div>
+                }
+            </div>
+        }
+        <div class="note">
+            <b>Kako određujemo cijenu?</b> Cijena zavisi od veličine oštećenja, broja zuba i izabranog materijala. Nakon pregleda dobijate pisani plan liječenja s tačnom cijenom, a radimo samo ono što vi odobrite. Plaćanje je gotovinom ili karticom.
+        </div>
+    </div>
+</section>

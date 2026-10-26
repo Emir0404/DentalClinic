@@ -1,0 +1,38 @@
+@model List<Doctor>
+@{
+    ViewData["Title"] = "Doktori i smjene";
+    var days = new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday };
+    var names = new Dictionary<DayOfWeek, string> { [DayOfWeek.Monday] = "Pon", [DayOfWeek.Tuesday] = "Uto", [DayOfWeek.Wednesday] = "Sri", [DayOfWeek.Thursday] = "Čet", [DayOfWeek.Friday] = "Pet", [DayOfWeek.Saturday] = "Sub" };
+    var upcoming = (Dictionary<int, int>)ViewBag.Upcoming;
+}
+<header class="page-title">
+    <h1>Doktori i smjene</h1>
+    <a class="btn primary" asp-action="NewDoctor">+ Dodaj doktora</a>
+</header>
+<section class="panel">
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Doktor</th>@foreach (var d in days) { <th>@names[d]</th> }<th>Budući termini</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var doc in Model)
+            {
+                <tr class="@(doc.IsActive ? "" : "dim")">
+                    <td class="doc-cell">
+                        <img src="@doc.PhotoUrl" alt="" width="40" height="40" />
+                        <div><b>@doc.Name</b>@if (!doc.IsActive) { <span class="badge st-cancelled" style="margin-left:.4rem">Neaktivan</span> }<br /><span class="muted small">@doc.Services.Count usluga</span>
+                            @if (doc.Shifts.Count == 0) { <br /><span class="small" style="color:var(--danger)">Nema radnog vremena</span> }</div>
+                    </td>
+                    @foreach (var d in days)
+                    {
+                        var shifts = doc.Shifts.Where(s => s.Day == d).OrderBy(s => s.Start).ToList();
+                        <td class="small">@if (shifts.Count == 0) { <span class="muted">–</span> } else { @Html.Raw(string.Join("<br />", shifts.Select(s => $"{s.Start:hh\\:mm}–{s.End:hh\\:mm}"))) }</td>
+                    }
+                    <td>@(upcoming.GetValueOrDefault(doc.Id))</td>
+                    <td class="r"><a class="btn sm" asp-action="EditDoctor" asp-route-id="@doc.Id">Uredi</a></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <p class="muted small" style="margin:1rem 0 0">Doktor koji više ne radi se <b>deaktivira</b> (historija termina ostaje). Brisanje je moguće samo za doktora bez ijednog termina.</p>
+</section>

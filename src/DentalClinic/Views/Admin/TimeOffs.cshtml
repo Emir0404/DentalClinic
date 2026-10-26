@@ -1,0 +1,42 @@
+@model List<TimeOff>
+@{
+    ViewData["Title"] = "Neradni dani";
+    var doctors = (List<Doctor>)ViewBag.Doctors;
+    var culture = ClinicInfo.Culture;
+}
+<header class="page-title"><h1>Neradni dani</h1></header>
+
+<section class="panel">
+    <h2>Dodaj neradni dan</h2>
+    <p class="muted small">Cijela ordinacija (praznik, renovacija) ili samo jedan doktor (godišnji odmor, kongres). Na te dane niko ne može zakazati. Već zakazani termini se ne brišu sami: sistem vas upozori koliko ih je.</p>
+    <form method="post" asp-action="AddTimeOff" class="filters">
+        <input type="date" name="date" required min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+        <select name="doctorId">
+            <option value="">Cijela ordinacija</option>
+            @foreach (var d in doctors) { <option value="@d.Id">@d.Name</option> }
+        </select>
+        <input name="reason" maxlength="120" placeholder="Razlog (npr. Državni praznik)" required />
+        <button class="btn primary" type="submit">Dodaj</button>
+    </form>
+</section>
+
+<section class="panel">
+    <h2>Nadolazeći neradni dani</h2>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Datum</th><th>Ko ne radi</th><th>Razlog</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var t in Model)
+            {
+                <tr>
+                    <td>@t.Date.ToString("dddd, dd.MM.yyyy.", culture)</td>
+                    <td>@(t.Doctor?.Name ?? "Cijela ordinacija")</td>
+                    <td>@t.Reason</td>
+                    <td class="r"><form method="post" asp-action="RemoveTimeOff" asp-route-id="@t.Id" style="margin:0"><button class="btn sm ghost" type="submit">Ukloni</button></form></td>
+                </tr>
+            }
+            @if (Model.Count == 0) { <tr><td colspan="4" class="muted">Nema unesenih neradnih dana.</td></tr> }
+            </tbody>
+        </table>
+    </div>
+</section>

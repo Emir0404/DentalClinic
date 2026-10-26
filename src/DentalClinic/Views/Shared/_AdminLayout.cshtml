@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>@(ViewData["Title"] is string t ? t + " · " : "")Admin · Osmijeh</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+</head>
+<body>
+@{
+    var signedIn = User.Identity?.IsAuthenticated == true;
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+    string Active(params string[] names) => names.Contains(action) ? "active" : "";
+}
+@if (!signedIn)
+{
+    <main class="login-wrap">@RenderBody()</main>
+}
+else
+{
+    <div class="shell">
+        <aside class="side">
+            <a class="side-brand" asp-action="Dashboard">Osmijeh<small>admin panel</small></a>
+            <nav>
+                <a class="@Active("Dashboard")" asp-action="Dashboard">Pregled</a>
+                <a class="@Active("Schedule")" asp-action="Schedule">Raspored</a>
+                <a class="@Active("Appointments", "Appointment")" asp-action="Appointments">Termini</a>
+                <a class="@Active("Services", "EditService")" asp-action="Services">Usluge i cijene</a>
+                <a class="@Active("Doctors", "EditDoctor")" asp-action="Doctors">Doktori i smjene</a>
+                <a class="@Active("TimeOffs")" asp-action="TimeOffs">Neradni dani</a>
+                <a class="@Active("Messages")" asp-action="Messages">Poruke</a>
+                <a href="/" target="_blank" rel="noopener">Javni sajt ↗</a>
+            </nav>
+            <form method="post" asp-action="Logout" class="side-foot">
+                <span>@User.Identity!.Name</span>
+                <button type="submit">Odjava</button>
+            </form>
+        </aside>
+        <main class="content">
+            @if (TempData["Ok"] is string ok) { <div class="flash ok" role="status">@ok</div> }
+            @if (TempData["Error"] is string err) { <div class="flash err" role="alert">@err</div> }
+            @RenderBody()
+        </main>
+    </div>
+}
+<script src="~/js/ui.js" asp-append-version="true"></script>
+</body>
+</html>

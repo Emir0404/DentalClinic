@@ -1,0 +1,22 @@
+@model List<ContactMessage>
+@{ ViewData["Title"] = "Poruke"; }
+<header class="page-title"><h1>Poruke</h1></header>
+@if (Model.Count == 0)
+{
+    <section class="panel"><p class="muted">Još nema poruka.</p></section>
+}
+@foreach (var m in Model)
+{
+    <section class="panel @(m.Handled ? "dim" : "")">
+        <div class="panel-head">
+            <div><b>@m.Name</b> <span class="muted small">· @m.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy. HH:mm")</span></div>
+            <span class="badge @(m.Handled ? "st-cancelled" : "st-scheduled")">@(m.Handled ? "Obrađeno" : "Novo")</span>
+        </div>
+        <p style="margin:.6rem 0 .8rem;white-space:pre-line">@m.Message</p>
+        <div class="actions">
+            <a class="btn sm" href="mailto:@m.Email?subject=Odgovor: Dental Studio Osmijeh">Odgovori emailom</a>
+            @if (!string.IsNullOrEmpty(m.Phone)) { <a class="btn sm ghost" href="tel:@m.Phone">@m.Phone</a> }
+            <form method="post" asp-action="ToggleMessage" asp-route-id="@m.Id"><button class="btn sm ghost" type="submit">@(m.Handled ? "Vrati u nove" : "Označi kao obrađeno")</button></form>
+        </div>
+    </section>
+}

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" role="img" aria-label="Fotografija nije dodana">
+  <rect width="400" height="500" fill="#e7f6f3"/>
+  <circle cx="200" cy="190" r="78" fill="#9fd8d1"/>
+  <path d="M50 500c0-110 68-170 150-170s150 60 150 170z" fill="#9fd8d1"/>
+  <path d="M155 345l45 70 45-70" fill="none" stroke="#e7f6f3" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
